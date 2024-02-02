@@ -1,45 +1,78 @@
-from PIL import Image, ImageOps
+from PIL import Image
+# using pillow, a fork of PIL, for image processing
+# https://pypi.org/project/pillow/
+# some 
+# https://pillow.readthedocs.io/en/stable/index.html
 
-# using PIL for image processing
+# converts an image file to text ASCII art
+# returns a list of strings, with each string being a line of the final artwork
+# {image_path} string, the path to the image file to be converted
+# {size} string, either small, medium, or large, denoting the size of the final ascii art
+def convert_image(image_path, size):
+    with Image.open(image_path, "r") as im:
 
-# uhhh i'll do this later
-def do_image(image, resolution):
-    pass
+        # convert image to grayscale
+        im = im.convert("L")
 
-image_path = input("enter path to image: ")
+        # resize image, because characters are more tall than they are wide
+        scaling_factor = -1
+        if size == "small":
+            scaling_factor = 0.2
+        elif size == "medium":
+            scaling_factor = 0.5
+        elif size == "large":
+            scaling_factor = 1
+        else:
+            raise Exception()
 
-with Image.open(image_path, "r") as im:
+        xsize = int((im.size[0] / 3) * scaling_factor)
+        ysize = int((im.size[1] / 7) * scaling_factor)
+        im = im.resize((xsize, ysize))
 
-    print(im.size, im.format, im.mode)
+        # convert image to text
+        # character gradient from https://paulbourke.net/dataformats/asciiart/
+        chars = " .:-=+*#%@"
+        output = []
 
-    # convert image to grayscale
-    im = im.convert("L")
-    outfile = image_path[:image_path.rfind(".")] + "_grayscale.png"
-    im.save(outfile, "PNG")
+        # iterate over each pixel in the image
+        for y in range(im.size[1]):
+            cur_line = ""
+            for x in range(im.size[0]):
+                # use the brightness of the pixel to pick a character from the 
+                index = int(im.getpixel((x, y)) / 255 * len(chars))
+                index = min(index, len(chars) - 1)
+                cur_line += chars[index]
+            output.append(cur_line)
 
-    # resize image
-    RATIO = 1
-    xsize = int((im.size[0] / 3) * RATIO)
-    ysize = int((im.size[1] / 7) * RATIO)
-    im = im.resize((xsize, ysize))
+    return output
 
-    outfile = image_path[:image_path.rfind(".")] + "_resized.png"
-    im.save(outfile, "PNG")
+while True:
 
-    # convert image to text
-    # 255 = white, 0 = black
+    valid_image = False
+    while not valid_image:
+        try:
+            # get an image from the user
+            image_path = input("enter path to image: ")
+            Image.open(image_path, "r")
+            valid_image = True
+        except Exception as e:
+            print(e)
 
-    # colors from https://paulbourke.net/dataformats/asciiart/
-    chars = " .:-=+*#%@"
-    output = []
-    for y in range(im.size[1]):
-        cur_line = ""
-        for x in range(im.size[0]):
-            index = int(im.getpixel((x, y)) / 255 * len(chars))
-            index = min(index, len(chars) - 1)
-            cur_line += chars[index]
-        output.append(cur_line)
-    
-    with open("out.txt", "w") as file:
-        for line in output:
-            file.write(line + "\n")
+    sizes = ["small", "medium", "large"]
+    valid_size = False
+    while not valid_size:
+        output_size = input("enter desired size of output (small, medium, or large): ")
+        if output_size.lower() in sizes:
+            valid_size = True
+        else:
+            print("invalid image size")
+
+    try:
+        result = convert_image(image_path, output_size)
+        output_file = image_path[:image_path.rfind('.')] + ".txt";
+        with open(output_file, "w") as file:
+            for row in result:
+                file.write(row + "\n")
+        print(f"sucessfully converted image! the output can be found in {output_file}")
+    except Exception as err:
+        print(err)

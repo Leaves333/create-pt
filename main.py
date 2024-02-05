@@ -26,7 +26,7 @@ def convert_image(image_path, size):
             raise Exception()
 
         xsize = int((im.size[0] / 3) * scaling_factor)
-        ysize = int((im.size[1] / 7) * scaling_factor)
+        ysize = int((im.size[1] / 6) * scaling_factor)
         im = im.resize((xsize, ysize))
 
         # convert image to text
@@ -46,33 +46,35 @@ def convert_image(image_path, size):
 
     return output
 
-while True:
+### main program code
 
-    valid_image = False
-    while not valid_image:
-        try:
-            # get an image from the user
-            image_path = input("enter path to image: ")
-            Image.open(image_path, "r")
-            valid_image = True
-        except Exception as e:
-            print(e)
-
-    sizes = ["small", "medium", "large"]
-    valid_size = False
-    while not valid_size:
-        output_size = input("enter desired size of output (small, medium, or large): ")
-        if output_size.lower() in sizes:
-            valid_size = True
-        else:
-            print("invalid image size")
-
+# get an image from the user
+valid_image = False
+while not valid_image:
     try:
-        result = convert_image(image_path, output_size)
-        output_file = image_path[:image_path.rfind('.')] + ".txt";
-        with open(output_file, "w") as file:
-            for row in result:
-                file.write(row + "\n")
-        print(f"sucessfully converted image! the output can be found in {output_file}")
-    except Exception as err:
-        print(err)
+        image_path = input("enter path to image: ")
+        Image.open(image_path, "r")
+        valid_image = True
+    except Exception as e:
+        print(e)
+
+# get a conversion size from the user
+sizes = ["small", "medium", "large"]
+valid_size = False
+while not valid_size:
+    output_size = input("enter desired size of output (small, medium, or large): ")
+    if output_size.lower() in sizes:
+        valid_size = True
+    else:
+        print("invalid image size")
+
+# call the convert_image function and output the image into a txt file
+try:
+    result = convert_image(image_path, output_size)
+    output_file = image_path[:image_path.rfind('.')] + ".txt";
+    with open(output_file, "w") as file:
+        for row in result:
+            file.write(row + "\n")
+    print(f"sucessfully converted image! the output can be found in {output_file}")
+except Exception as err:
+    print(err)

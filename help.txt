@@ -1,0 +1,7 @@
+a friendly list of commands:
+
+(h) help: displays this menu
+
+(n) next: advances to the next day
+(b) buy item* amount*: purchases the selected item
+(s) sell item* amount*: sells the selected item   

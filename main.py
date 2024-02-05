@@ -1,7 +1,6 @@
 from PIL import Image
 # using pillow, a fork of PIL, for image processing
 # https://pypi.org/project/pillow/
-# some 
 # https://pillow.readthedocs.io/en/stable/index.html
 
 # converts an image file to text ASCII art
@@ -47,34 +46,39 @@ def convert_image(image_path, size):
     return output
 
 ### main program code
+while True:
+    # get an image from the user
+    valid_image = False
+    while not valid_image:
+        try:
+            image_path = input("enter path to image: ")
+            Image.open(image_path, "r")
+            valid_image = True
+        except Exception as e:
+            print(e)
 
-# get an image from the user
-valid_image = False
-while not valid_image:
+    # get a conversion size from the user
+    sizes = ["small", "medium", "large"]
+    valid_size = False
+    while not valid_size:
+        output_size = input("enter desired size of output (small, medium, or large): ")
+        if output_size.lower() in sizes:
+            valid_size = True
+        else:
+            print("invalid image size")
+
+    # call the convert_image function and output the image into a txt file
     try:
-        image_path = input("enter path to image: ")
-        Image.open(image_path, "r")
-        valid_image = True
-    except Exception as e:
-        print(e)
-
-# get a conversion size from the user
-sizes = ["small", "medium", "large"]
-valid_size = False
-while not valid_size:
-    output_size = input("enter desired size of output (small, medium, or large): ")
-    if output_size.lower() in sizes:
-        valid_size = True
-    else:
-        print("invalid image size")
-
-# call the convert_image function and output the image into a txt file
-try:
-    result = convert_image(image_path, output_size)
-    output_file = image_path[:image_path.rfind('.')] + ".txt";
-    with open(output_file, "w") as file:
-        for row in result:
-            file.write(row + "\n")
-    print(f"sucessfully converted image! the output can be found in {output_file}")
-except Exception as err:
-    print(err)
+        result = convert_image(image_path, output_size)
+        output_file = image_path[:image_path.rfind('.')] + ".txt";
+        with open(output_file, "w") as file:
+            for row in result:
+                file.write(row + "\n")
+        print(f"sucessfully converted image! the output can be found in {output_file}")
+    except Exception as err:
+        print("failed to convert image!")
+        print(err)
+    
+    # ask user if they want to convert another image
+    if input("convert another image? (y/n) ") != "y":
+        break

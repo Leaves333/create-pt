@@ -3,5 +3,5 @@ a friendly list of commands:
 (h) help: displays this menu
 
 (n) next: advances to the next day
-(b) buy item* amount*: purchases the selected item
-(s) sell item* amount*: sells the selected item   
+(b) buy amount* item*: purchases the selected item
+(s) sell amount* item*: sells the selected item   

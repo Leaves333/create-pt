@@ -17,3 +17,5 @@ need to include: dict to store amount of each stock
 the function should print stuff out to screen using a loop... but it needs a parameter
 
 on second thought this is a lot of work to record a video, we're going back to 
+
+[uwu](carbon.now.sh)

@@ -9,7 +9,11 @@ INITIAL_PRICES = {
     "weapons": 15,
     "potions": 25
 }
+
 FORECAST_VOLATILITY = 0.6
+FORECAST_CORRECTION = 0.3
+
+SHOW_FORECAST_VALUES = False
 
 # init variables
 day = 1
@@ -24,6 +28,14 @@ for key in prices:
     forecast[key] = random()
     dforecast[key] = random()
 
+# util to clamp values
+def clamp(x, low, high):
+    return max(low, min(high, x))
+
+def display_help():
+    with open("help.txt", "r") as file:
+        print(file.read())
+
 def display_game():
 
     # print header
@@ -33,6 +45,9 @@ def display_game():
 
     # tabulate items
     table_headers = ["item", "amount", "price", "forecast"]
+    if SHOW_FORECAST_VALUES:
+        table_headers.append("%")
+        table_headers.append("df")
 
     data = []
     for item in prices:
@@ -54,6 +69,10 @@ def display_game():
         elif abs(forecast[item] - 0.5) > 0.2:
             forecast_text *= 2
         cur_row.append(forecast_text)
+
+        if SHOW_FORECAST_VALUES:
+            cur_row.append(round(forecast[item], 2))
+            cur_row.append(round(dforecast[item], 2))
 
         data.append(cur_row)
 
@@ -83,8 +102,27 @@ def sell(item, quantity):
     else:
         print("not enough in stock")
 
+# main menu code
+print()
+print("welcome to MEDIEVAL MERCHANT SIMULATOR DELUXE™")
+print()
+print("type a command:")
+print("- start")
+print("- help")
+print()
 
-while day < 20:
+while True:
+    command = input()
+    if command in ["start", "s"]:
+        break
+    elif command in ["help", "h"]:
+        display_help()
+    else:
+        print("invalid command")
+        continue
+
+# game code
+while day <= 20:
 
     while True:
 
@@ -96,9 +134,9 @@ while day < 20:
         args = args.split()
         print()
 
-        if args[0] == "next":
+        if args[0] in ["next", "n"]:
             break
-        elif args[0] == "buy":
+        elif args[0] in ["buy", "b"]:
 
             amount = args[1]
             item = args[2]
@@ -115,13 +153,14 @@ while day < 20:
                 continue
 
             if item not in prices.keys():
-                print(f"invalid item: {amount}")
+                print(f"invalid item: {item}")
                 continue
 
             # call the actual function
             buy(item, amount)
+            break
 
-        elif args[0] == "sell":
+        elif args[0] in ["sell", "s"]:
 
             amount = args[1]
             item = args[2]
@@ -138,11 +177,12 @@ while day < 20:
                 continue
 
             if item not in prices.keys():
-                print(f"invalid item: {amount}")
+                print(f"invalid item: {item}")
                 continue
 
             # call the actual function
             sell(item, amount)
+            break
 
         else:
             print("invalid command")
@@ -152,19 +192,21 @@ while day < 20:
     # update prices based on deltas
     for item in prices:
 
-        dx = round(prices[item] / 4)
+        max_change = max(1, round(INITIAL_PRICES[item] / 4))
+        change = randint(1, max_change)
         if random() < forecast[item]:
-            prices[item] += randint(0, dx)
+            prices[item] += change
         else:
-            prices[item] -= randint(0, dx)
+            prices[item] -= change
 
         prices[item] = max(1, prices[item])
 
     # update forecast randomly
     for item in forecast:
         forecast[item] += (dforecast[item] - 0.5) * FORECAST_VOLATILITY
-        forecast[item] = max(0, min(1, forecast[item]))
-        dforecast[item] = random()
+        forecast[item] = clamp(forecast[item], 0, 1)
+        dforecast[item] = random() + FORECAST_CORRECTION * (0.5 - forecast[item])
+        dforecast[item] = clamp(dforecast[item], 0, 1)
 
 sold = 0
 for item in stock:

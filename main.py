@@ -3,6 +3,9 @@ from PIL import Image
 # https://pypi.org/project/pillow/
 # https://pillow.readthedocs.io/en/stable/index.html
 
+# sample image used in video from wikipedia:
+# https://en.wikipedia.org/wiki/Atlantic_puffin#/media/File:Puffin_(Fratercula_arctica).jpg
+
 # converts an image file to text ASCII art
 # returns a list of strings, with each string being a line of the final artwork
 # {image_path} string, the path to the image file to be converted
@@ -25,19 +28,19 @@ def convert_image(image_path, size):
             raise Exception()
 
         xsize = int((im.size[0] / 3) * scaling_factor)
-        ysize = int((im.size[1] / 6) * scaling_factor)
+        ysize = int((im.size[1] / 7) * scaling_factor)
         im = im.resize((xsize, ysize))
 
         # convert image to text
         # character gradient from https://paulbourke.net/dataformats/asciiart/
-        chars = " .:-=+*#%@"
+        chars = [c for c in " .:-=+*#%@"]
         output = []
 
         # iterate over each pixel in the image
         for y in range(im.size[1]):
             cur_line = ""
             for x in range(im.size[0]):
-                # use the brightness of the pixel to pick a character from the 
+                # use the brightness of the pixel to pick a character from the gradient
                 index = int(im.getpixel((x, y)) / 255 * len(chars))
                 index = min(index, len(chars) - 1)
                 cur_line += chars[index]
@@ -47,6 +50,7 @@ def convert_image(image_path, size):
 
 ### main program code
 while True:
+    
     # get an image from the user
     valid_image = False
     while not valid_image:

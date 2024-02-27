@@ -78,7 +78,7 @@ while True:
         with open(output_file, "w") as file:
             for row in result:
                 file.write(row + "\n")
-        print(f"sucessfully converted image! the output can be found in {output_file}")
+        print(f"successfully converted image! the output can be found in {output_file}")
     except Exception as err:
         print("failed to convert image!")
         print(err)
